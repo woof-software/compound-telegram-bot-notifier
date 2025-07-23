@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { ContractService } from 'contract/contract.service';
 import { RedisService } from 'redis/redis.service';
 
@@ -9,12 +10,17 @@ export class CheckProposalService {
   constructor(
     private readonly contractService: ContractService,
     private readonly redisService: RedisService,
+    private readonly configService: ConfigService,
   ) {}
 
   async check() {
     this.logger.log('⏰ Starting proposal check...');
     try {
-      const lastExecutedProposalId = 461;
+      const lastExecutedProposalId = this.configService.get<string>(
+        'LAST_EXECUTED_PROPOSAL_ID',
+      )
+        ? Number(this.configService.get<string>('LAST_EXECUTED_PROPOSAL_ID'))
+        : 462;
       const lastProposalId = await this.contractService.getLastProposalCount();
       for (
         let proposalId = lastExecutedProposalId + 1;

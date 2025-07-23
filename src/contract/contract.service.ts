@@ -156,10 +156,7 @@ export class ContractService {
         const votes = await this.getProposalVotes(proposalId);
         const quorum = await this.getQuorum(snapshot);
         const isVotesEnough = votes.forVotes >= quorum;
-        const votingDelay = await this.getVotingDelay();
-        const startVotingTimestamp = await this.getTimestamp(
-          snapshot + votingDelay,
-        );
+        const startVotingTimestamp = await this.getTimestamp(snapshot);
         const startVotingDate = new Date(startVotingTimestamp).getTime();
         const dateNow = new Date().getTime();
         if (dateNow - startVotingDate >= DAY_IN_MS * 2 && !isVotesEnough) {
