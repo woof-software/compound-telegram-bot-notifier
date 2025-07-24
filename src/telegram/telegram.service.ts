@@ -37,23 +37,29 @@ export class TelegramService {
     quorum: number,
   ): Promise<void> {
     const message = `
-🚨 <b>Proposal Alert</b> 🚨
+⚠️ <b>Proposal Notification</b> ⚠️
 
 📋 <b>Proposal ID:</b> ${proposalId}
 ⏰ <b>Status:</b> Active for more than 48 hours
 📊 <b>Voting Status:</b> Not enough votes
 
 <b>Current Votes:</b>
-✅ For: ${votes.forVotes}
-❌ Against: ${votes.againstVotes}
-⚪ Abstain: ${votes.abstainVotes}
+✅ For: ${this.formatNumber(Math.floor(votes.forVotes))}
+❌ Against: ${this.formatNumber(Math.ceil(votes.againstVotes))}
+⚪ Abstain: ${this.formatNumber(Math.ceil(votes.abstainVotes))}
 
-<b>Required Quorum:</b> ${quorum}
-<b>Missing:</b> ${Math.max(0, quorum - votes.forVotes)} votes
+<b>Required Quorum:</b> ${this.formatNumber(quorum)}
+<b>Missing:</b> ${this.formatNumber(
+      Math.ceil(Math.max(0, quorum - votes.forVotes)),
+    )} votes
 
 🔗 <a href="https://www.tally.xyz/gov/compound/proposal/${proposalId}">View Proposal</a>
     `.trim();
 
     await this.sendMessage(message);
+  }
+
+  private formatNumber(num: number): string {
+    return num.toLocaleString('en-US');
   }
 }
