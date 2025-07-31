@@ -40,7 +40,7 @@ export class TelegramService {
 ⚠️ <b>Proposal Notification</b> ⚠️
 
 📋 <b>Proposal ID:</b> ${proposalId}
-⏰ <b>Status:</b> Active for more than 48 hours
+⏰ <b>Status:</b> Active for more than 30 hours
 📊 <b>Voting Status:</b> Not enough votes
 
 <b>Current Votes:</b>

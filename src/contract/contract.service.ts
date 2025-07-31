@@ -5,10 +5,10 @@ import { proposalContractAddress } from './constants';
 import ProposalABI from './abi/ProposalABI.json';
 import { ConfigService } from '@nestjs/config';
 import { NetworkConfig } from 'config/networks.config';
-import { DAY_IN_MS } from 'common/constants';
 import { TelegramService } from 'telegram/telegram.service';
 import { GithubService } from 'github/github.service';
 import { RedisService } from 'redis/redis.service';
+import { HOUR_IN_MS } from 'common/constants';
 
 @Injectable()
 export class ContractService {
@@ -159,7 +159,7 @@ export class ContractService {
         const startVotingTimestamp = await this.getTimestamp(snapshot);
         const startVotingDate = new Date(startVotingTimestamp).getTime();
         const dateNow = new Date().getTime();
-        if (dateNow - startVotingDate >= DAY_IN_MS * 2 && !isVotesEnough) {
+        if (dateNow - startVotingDate >= HOUR_IN_MS * 30 && !isVotesEnough) {
           await this.telegramService.sendProposalAlert(
             proposalId,
             votes,

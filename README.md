@@ -3,7 +3,7 @@ An automated bot for monitoring Compound proposals and sending notifications to 
 📋 Description
 The bot monitors the state of proposals in the Compound smart contract and performs the following actions:
 
-🔔 Sends Telegram notifications when a proposal is active for more than 48 hours and hasn't reached the required quorum
+🔔 Sends Telegram notifications when a proposal is active for more than 30 hours and hasn't reached the required quorum
 📝 Creates GitHub issues for executed proposals (state === 7)
 🗄️ Uses Redis to prevent duplicate notifications and issues
 ⏰ Runs on schedule (every 6 hours) or on-demand via CLI
@@ -132,7 +132,7 @@ The bot automatically runs every 6 hours and checks:
 
 Active Proposals (state === 1):
 
-Calculates if proposal is active for 48+ hours
+Calculates if proposal is active for 30+ hours
 Checks if quorum is reached
 Sends Telegram alert if votes are insufficient
 Prevents duplicate notifications via Redis
@@ -148,7 +148,7 @@ Example notification format:
 🚨 Proposal Alert 🚨
 
 📋 Proposal ID: 123
-⏰ Status: Active for more than 48 hours
+⏰ Status: Active for more than 30 hours
 📊 Voting Status: Not enough votes
 
 Current Votes:
