@@ -4,9 +4,10 @@ import { CheckProposalCommand } from './cli/check-proposal.command';
 import { CheckProposalCron } from './cron/check-proposal.cron';
 import { CheckProposalService } from './check-proposal.service';
 import { RedisModule } from 'redis/redis.module';
+import { TelegramModule } from 'telegram/telegram.module';
 
 @Module({
-  imports: [ContractModule, RedisModule],
+  imports: [ContractModule, RedisModule, TelegramModule],
   providers: [CheckProposalCommand, CheckProposalCron, CheckProposalService],
   exports: [CheckProposalService],
 })

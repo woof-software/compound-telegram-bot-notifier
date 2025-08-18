@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { DAY_IN_MS, DAY_IN_SECONDS } from 'common/constants';
 import Redis from 'ioredis';
 
 @Injectable()
@@ -98,6 +99,71 @@ export class RedisService {
         error,
       );
       return null;
+    }
+  }
+
+  private tgKey(chatId: string): string {
+    return `tg:sent:${chatId}`;
+  }
+
+  async trackTelegramMessage(
+    chatId: string,
+    messageId: number,
+    timestampMs = Date.now(),
+    keyTtlSeconds = 14 * DAY_IN_SECONDS,
+  ): Promise<void> {
+    const key = this.tgKey(chatId);
+    try {
+      await this.redis.zadd(key, timestampMs, String(messageId));
+      await this.redis.expire(key, keyTtlSeconds);
+    } catch (error) {
+      this.logger.error(
+        `Error tracking message_id=${messageId} for chat=${chatId}:`,
+        error,
+      );
+      throw error;
+    }
+  }
+
+  async fetchOldTelegramMessageIds(
+    chatId: string,
+    olderThanMs = DAY_IN_MS,
+    limit = 100,
+  ): Promise<string[]> {
+    const key = this.tgKey(chatId);
+    const cutoffScore = Date.now() - olderThanMs;
+    try {
+      // ZRANGEBYSCORE key -inf cutoff LIMIT 0 limit
+      const ids = await this.redis.zrangebyscore(
+        key,
+        0,
+        cutoffScore,
+        'LIMIT',
+        0,
+        limit,
+      );
+      return ids;
+    } catch (error) {
+      this.logger.error(
+        `Error fetching old message ids for chat=${chatId}:`,
+        error,
+      );
+      return [];
+    }
+  }
+
+  async removeTelegramMessageIds(
+    chatId: string,
+    ids: string[],
+  ): Promise<number> {
+    if (!ids.length) return 0;
+    const key = this.tgKey(chatId);
+    try {
+      const removed = await this.redis.zrem(key, ...ids);
+      return removed;
+    } catch (error) {
+      this.logger.error(`Error removing ${ids.length} ids from ${key}:`, error);
+      return 0;
     }
   }
 

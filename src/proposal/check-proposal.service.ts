@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ContractService } from 'contract/contract.service';
 import { RedisService } from 'redis/redis.service';
+import { TelegramService } from 'telegram/telegram.service';
 
 @Injectable()
 export class CheckProposalService {
@@ -11,6 +12,7 @@ export class CheckProposalService {
     private readonly contractService: ContractService,
     private readonly redisService: RedisService,
     private readonly configService: ConfigService,
+    private readonly telegramService: TelegramService,
   ) {}
 
   async check() {
@@ -34,6 +36,7 @@ export class CheckProposalService {
         await this.contractService.checkProposal(proposalId);
       }
       this.logger.log('Check proposals completed.');
+      await this.telegramService.cleanupOlderThan24h();
       return;
     } catch (error) {
       this.logger.error('An error occurred while checking proposals:', error);
